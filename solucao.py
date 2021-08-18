@@ -14,7 +14,6 @@ class Nodo:
         self.pai = pai
         self.acao = acao
         self.custo = custo
-        print(f'Nodo criado: {self.estado} a partir do nodo {self.pai}')
 
 
 def sucessor(estado):
@@ -67,8 +66,31 @@ def bfs(estado):
     :param estado: str
     :return:
     """
-    # substituir a linha abaixo pelo seu codigo
-    raise NotImplementedError
+    if estado == '12345678_':
+        print('O estado inicial já condiz com o objetivo')
+        return []
+    initial_node = Nodo(estado, None, None, 0)
+    explored = []
+    border = [initial_node]
+
+    while True:
+        if not estado:
+            return None
+        current_vertex = border.pop(0)
+        if current_vertex.estado == '12345678_':
+            path = get_path(current_vertex)
+            return path
+        explored.append(current_vertex)
+        border += expande(current_vertex)
+
+
+def get_path(current_vertex):
+    path = []
+    while current_vertex.acao is not None:
+        path.insert(0, current_vertex.acao)
+        current_vertex = current_vertex.pai
+
+    return path
 
 
 def dfs(estado):
