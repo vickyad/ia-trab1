@@ -122,13 +122,26 @@ def astar_manhattan(estado):
 
 
 # Auxiliar functions
-def swap_elements(string, blank_index, new_blank_position):
+def swap_elements(string: str, fst_index: int, snd_index: int) -> str:
+    """
+    Troca dois caracteres de lugar
+    :param string: palavra a ter dois caracteres trocados
+    :param fst_index: index de um caracter
+    :param snd_index: index do outro caracter
+    :return: palavra com a troca de caracteres feita
+    """
     string_list = list(string)
-    string_list[blank_index], string_list[new_blank_position] = string_list[new_blank_position], string_list[blank_index]
+    string_list[fst_index], string_list[snd_index] = string_list[snd_index], string_list[fst_index]
     return ''.join(string_list)
 
 
-def get_path(current_vertex):
+def get_path(current_vertex: Nodo) -> list:
+    """
+    Função que percorre a árvore a partir do nodo fornecido até o nodo pai inicial
+    retornando uma lista com as ações que levaram até o nodo atual
+    :param current_vertex: nodo atual
+    :return: lista com as ações que levaram do nodo do estado inicial até o nodo atual
+    """
     path = []
     while current_vertex.acao is not None:
         path.insert(0, current_vertex.acao)
@@ -137,7 +150,13 @@ def get_path(current_vertex):
     return path
 
 
-def is_valid_state(state):
+def is_valid_state(state: str) -> bool:
+    """
+    Função que avalia se um estado é válido ou não
+    Para um estado ser válido, é necessário tem 9 caracteres, sendo um de cada um dos valores 1-8 + '_'
+    :param state: estado a ser verificado
+    :return: booleano indicando se o estado é válido ou não
+    """
     if len(state) != 9:
         return False
 
