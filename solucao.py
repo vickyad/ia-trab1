@@ -142,10 +142,7 @@ def is_valid_state(state):
         return False
 
     okay_chars = '12345678_'
-    if not all(char in okay_chars for char in state):
+    if not all(char in state for char in okay_chars):
         return False
 
-    if '1' in state and '2' in state and '3' in state and '4' in state and '5' in state and '6' in state and '7' in state and '8' in state and '_' in state:
-        return True
-
-    return False
+    return True
