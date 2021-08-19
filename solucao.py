@@ -40,12 +40,6 @@ def sucessor(estado):
     return successors
 
 
-def swap_elements(string, blank_index, new_blank_position):
-    string_list = list(string)
-    string_list[blank_index], string_list[new_blank_position] = string_list[new_blank_position], string_list[blank_index]
-    return ''.join(string_list)
-
-
 def expande(nodo):
     """
     Recebe um nodo (objeto da classe Nodo) e retorna um iterable de nodos.
@@ -66,6 +60,10 @@ def bfs(estado):
     :param estado: str
     :return:
     """
+    if not is_valid_state(estado):
+        print('Estado invalido. Por favor, tente novamente')
+        return
+
     if estado == '12345678_':
         print('O estado inicial já condiz com o objetivo')
         return []
@@ -82,15 +80,6 @@ def bfs(estado):
             return path
         explored.append(current_vertex)
         border += expande(current_vertex)
-
-
-def get_path(current_vertex):
-    path = []
-    while current_vertex.acao is not None:
-        path.insert(0, current_vertex.acao)
-        current_vertex = current_vertex.pai
-
-    return path
 
 
 def dfs(estado):
@@ -130,3 +119,33 @@ def astar_manhattan(estado):
     """
     # substituir a linha abaixo pelo seu codigo
     raise NotImplementedError
+
+
+# Auxiliar functions
+def swap_elements(string, blank_index, new_blank_position):
+    string_list = list(string)
+    string_list[blank_index], string_list[new_blank_position] = string_list[new_blank_position], string_list[blank_index]
+    return ''.join(string_list)
+
+
+def get_path(current_vertex):
+    path = []
+    while current_vertex.acao is not None:
+        path.insert(0, current_vertex.acao)
+        current_vertex = current_vertex.pai
+
+    return path
+
+
+def is_valid_state(state):
+    if len(state) != 9:
+        return False
+
+    okay_chars = '12345678_'
+    if not all(char in okay_chars for char in state):
+        return False
+
+    if '1' in state and '2' in state and '3' in state and '4' in state and '5' in state and '6' in state and '7' in state and '8' in state and '_' in state:
+        return True
+
+    return False
