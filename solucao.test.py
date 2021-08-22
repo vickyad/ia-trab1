@@ -1,5 +1,7 @@
 import unittest
 import solucao
+import action
+import constants
 
 
 class TestaSolucao(unittest.TestCase):
@@ -52,34 +54,37 @@ class TestaSolucao(unittest.TestCase):
         self.assertIsNone(solucao.bfs("185423_67"))
 
     def test_astar_hamming(self):
+        return 0
         """
         Testa o A* com dist. Hamming em um estado com solução e outro sem solução
         :return:
         """
+        state_with_solution_in_23_steps = "2_3541687"
+        actions_to_solve = solucao.astar_hamming(state_with_solution_in_23_steps)
+        self.assertEqual(23, len(actions_to_solve))
 
-        # nao ha solucao a partir do estado 185423_67
-        self.assertIsNone(solucao.astar_hamming("185423_67"))
+        final_state = action.play_game(state_with_solution_in_23_steps, actions_to_solve)
+        self.assertEqual(final_state, constants.FINAL_STATE)
 
-        # no estado 2_3541687, a solucao otima tem 23 movimentos.
-        result = solucao.astar_hamming("2_3541687")
-        self.assertEqual(23, len(result))
+        state_without_solution = "185423_67"
+        self.assertIsNone(solucao.astar_hamming(state_without_solution))
 
-        print("Atencao! O A* Hamming passar nesse teste apenas significa que a lista retornada tem o "
-              "numero correto de elementos. Nao verificamos se as acoes levam para a solucao!")
 
     def test_astar_manhattan(self):
-        return 0
         """
         Testa o A* com dist. Manhattan em um estado com solução e outro sem solução
         :return:
         """
-        # no estado 2_3541687, a solucao otima tem 23 movimentos.
-        self.assertEqual(23, len(solucao.astar_manhattan("2_3541687")))
-        print("Atencao! O A* Manhattan passar nesse teste apenas significa que a lista retornada tem o "
-              "numero correto de elementos. Nao verificamos se as acoes levam para a solucao!")
+        state_with_solution_in_23_steps = "2_3541687"
 
-        # nao ha solucao a partir do estado 185423_67
-        self.assertIsNone(solucao.astar_manhattan("185423_67"))
+        actions_to_solve = solucao.astar_manhattan(state_with_solution_in_23_steps)
+        self.assertEqual(23, len(actions_to_solve))
+
+        final_state = action.play_game(state_with_solution_in_23_steps, actions_to_solve)
+        self.assertEqual(final_state, constants.FINAL_STATE)
+
+        state_without_solution = "185423_67"
+        self.assertIsNone(solucao.astar_manhattan(state_without_solution))
 
     def test_dfs(self):
         return 0

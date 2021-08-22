@@ -1,7 +1,6 @@
 from typing import Callable
-
-
-FINAL_STATE = "12345678_"
+import constants
+import action
 
 
 class Nodo:
@@ -32,17 +31,29 @@ def sucessor(estado: str) -> tuple[str, str]:
     :return:
     """
     # localizar espaço em branco
-    blank_position = estado.index('_')
+    blank_position = estado.index(constants.EMPTY_CHAR)
     # testes de direção
     successors = []
     if blank_position - 3 >= 0:
-        successors.append(('acima', swap_elements(estado, blank_position, blank_position - 3)))
+        successors.append((
+            constants.UP, 
+            action.perform_action(estado, constants.UP)
+        ))
     if blank_position + 3 <= 8:
-        successors.append(('abaixo', swap_elements(estado, blank_position, blank_position + 3)))
+        successors.append((
+            constants.DOWN, 
+            action.perform_action(estado, constants.DOWN)
+        ))
     if (blank_position + 1) % 3 != 0:
-        successors.append(('direita', swap_elements(estado, blank_position, blank_position + 1)))
+        successors.append((
+            constants.RIGHT, 
+            action.perform_action(estado, constants.RIGHT)
+        ))
     if blank_position % 3 != 0:
-        successors.append(('esquerda', swap_elements(estado, blank_position, blank_position - 1)))
+        successors.append((
+            constants.LEFT, 
+            action.perform_action(estado, constants.LEFT)
+        ))
 
     return successors
 
@@ -71,7 +82,7 @@ def bfs(estado):
         print('Estado invalido. Por favor, tente novamente')
         return
 
-    if estado == '12345678_':
+    if estado == constants.FINAL_STATE:
         print('O estado inicial já condiz com o objetivo')
         return []
     initial_node = Nodo(estado, None, None, 0)
@@ -82,7 +93,7 @@ def bfs(estado):
         if not estado:
             return None
         current_vertex = border.pop(0)
-        if current_vertex.estado == '12345678_':
+        if current_vertex.estado == constants.FINAL_STATE:
             path = get_path(current_vertex)
             return path
         explored.append(current_vertex)
@@ -139,20 +150,7 @@ def is_empty(list: list) -> bool:
 
 
 def is_final_state(state: str):
-    return state == FINAL_STATE 
-
-
-def swap_elements(string: str, fst_index: int, snd_index: int) -> str:
-    """
-    Troca dois caracteres de lugar
-    :param string: palavra a ter dois caracteres trocados
-    :param fst_index: index de um caracter
-    :param snd_index: index do outro caracter
-    :return: palavra com a troca de caracteres feita
-    """
-    string_list = list(string)
-    string_list[fst_index], string_list[snd_index] = string_list[snd_index], string_list[fst_index]
-    return ''.join(string_list)
+    return state == constants.FINAL_STATE 
 
 
 def get_path(current_vertex: Nodo) -> list[str]:
@@ -198,11 +196,11 @@ def are_pieces_inverted(piece_one: str, piece_two: str) -> bool:
 
 
 def get_piece_right_position_in_final_state(piece):
-    return FINAL_STATE.find(piece)
+    return constants.FINAL_STATE.find(piece)
 
 
 def is_empty_space(piece: str) -> bool:
-    return piece == '_'
+    return piece == constants.EMPTY_CHAR
 
 
 def is_valid_state(state: str) -> bool:
@@ -215,7 +213,7 @@ def is_valid_state(state: str) -> bool:
     if len(state) != 9:
         return False
 
-    okay_chars = '12345678_'
+    okay_chars = constants.FINAL_STATE
     if not all(char in state for char in okay_chars):
         return False
 
@@ -240,7 +238,7 @@ def calc_hamming_estimated_cost(state: str) -> int:
 
 
 def piece_is_in_the_right_position(piece: str, position: int) -> bool:
-    right_piece = FINAL_STATE[position]
+    right_piece = constants.FINAL_STATE[position]
     return piece == right_piece
 
 
