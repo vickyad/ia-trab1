@@ -1,3 +1,6 @@
+ESTADO_OBJETIVO = "12345678_"
+
+
 class Nodo:
     """
     Implemente a classe Nodo com os atributos descritos na funcao init
@@ -97,6 +100,20 @@ def astar_hamming(estado):
     raise NotImplementedError
 
 
+def distancia_de_hamming(estado: str) -> int:
+    distancia = 0
+    for posicao, peca in enumerate(estado):
+        if peca_esta_na_posicao_errada(peca, posicao):
+            distancia += 1
+
+    return distancia
+
+
+def peca_esta_na_posicao_errada(peca: str, posicao: int) -> bool:
+    peca_correta = ESTADO_OBJETIVO[posicao]
+    return peca != peca_correta
+
+
 def astar_manhattan(estado):
     """
     Recebe um estado (string), executa a busca A* com h(n) = soma das distâncias de Manhattan e
@@ -108,3 +125,17 @@ def astar_manhattan(estado):
     """
     # substituir a linha abaixo pelo seu codigo
     raise NotImplementedError
+
+
+def distancia_manhattan(estado: str) -> int:
+    distancia = 0
+    for posicao, peca in enumerate(estado):
+        distancia += distancia_da_peca_a_sua_posicao_correta(peca, posicao)
+
+    return distancia
+
+
+def distancia_da_peca_a_sua_posicao_correta(peca: str, posicao_atual: int) -> int: 
+    posicao_correta = ESTADO_OBJETIVO.index(peca)
+    return abs(posicao_correta - posicao_atual)
+
