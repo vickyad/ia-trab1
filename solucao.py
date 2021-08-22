@@ -101,65 +101,45 @@ def dfs(estado):
     raise NotImplementedError
 
 
-def astar_hamming(estado):
-    """
-    Recebe um estado (string), executa a busca A* com h(n) = soma das distâncias de Hamming e
-    retorna uma lista de ações que leva do
-    estado recebido até o objetivo ("12345678_").
-    Caso não haja solução a partir do estado recebido, retorna None
-    :param estado: str
-    :return:
-    """
-    # substituir a linha abaixo pelo seu codigo
-    raise NotImplementedError
+def astar_hamming(initial_state: str):
+    return astar(initial_state, calc_hamming_estimated_cost)
 
 
-def hamming_distance(puzzle_state: str) -> int:
-    return for_each_piace_sum(
-        puzzle_state, 
-        lambda piece, position: 0 if piece_is_in_the_right_position(piece, position) else 1
-    )   
+def astar_manhattan(initial_state: str):
+    return astar(initial_state, calc_manhattan_estimated_cost)
 
 
-def piece_is_in_the_right_position(piece: str, position: int) -> bool:
-    right_piece = FINAL_STATE[position]
-    return piece != right_piece
+def astar(initial_state: str, calc_estimated_cost: Callable[[str], int]):
+    initial_node = Nodo(initial_state, None, None, 0)
+    border = [initial_node]
+    explored = []
+
+    try:
+        while True:
+            current_node = find_node_with_the_lowest_estimated_cost(border, calc_estimated_cost)
+            if is_final_state(current_node.estado):
+                return get_path(current_node)
+            border += explore_node(current_node)
+            explored.append(current_node)
+    except:
+        return None
 
 
-def astar_manhattan(initial_state):
-    """
-    Recebe um estado (string), executa a busca A* com h(n) = soma das distâncias de Manhattan e
-    retorna uma lista de ações que leva do
-    estado recebido até o objetivo ("12345678_").
-    Caso não haja solução a partir do estado recebido, retorna None
-    :param estado: str
-    :return:
-    """
-    # substituir a linha abaixo pelo seu codigo
-    raise NotImplementedError
-
-
-def manhattan_distance(puzzle_state: str) -> int:
-    return for_each_piace_sum(
-        puzzle_state, 
-        distance_from_the_piece_to_its_correct_position
-    )        
-
-
-def distance_from_the_piece_to_its_correct_position(piece: str, current_position: int) -> int: 
-    right_position = FINAL_STATE.index(piece)
-    return abs(right_position - current_position)
-
-
-def for_each_piace_sum(puzzle_state: str, value_func: Callable[[str, int], int]) -> int:
-    value = 0
-    for posicao, peca in enumerate(puzzle_state):
-        value += value_func(posicao, peca)
-
-    return value
+def explore_node(node: Nodo) -> list[Nodo]:
+    new_border_nodes = expande(node)
+    for_each_node_sum_cost(new_border_nodes, node.custo)
+    return new_border_nodes
 
 
 # Auxiliar functions
+def is_empty(list: list) -> bool:
+    return not list
+
+
+def is_final_state(state: str):
+    return state == FINAL_STATE 
+
+
 def swap_elements(string: str, fst_index: int, snd_index: int) -> str:
     """
     Troca dois caracteres de lugar
@@ -203,3 +183,52 @@ def is_valid_state(state: str) -> bool:
         return False
 
     return True
+
+
+def for_each_piace_sum(state: str, value_func: Callable[[str, int], int]) -> int:
+    value = 0
+    for posicao, peca in enumerate(state):
+        value += value_func(posicao, peca)
+
+    return value
+
+
+def for_each_node_sum_cost(nodes: list[Nodo], cost: int):
+    for node in nodes:
+        node.custo += cost
+
+def find_node_with_the_lowest_estimated_cost(border: list[Nodo], calc_estimated_cost: Callable[[Nodo], int]) -> Nodo:
+    if is_empty(border): 
+        raise Exception('Fail! Empty border.') 
+
+    selected_node = border.pop()
+    lowest_cost = calc_estimated_cost(selected_node) + selected_node.custo
+    for node in border:
+        node_cost = calc_estimated_cost(node) + node.custo
+        if node_cost < lowest_cost:
+            selected_node = node
+            lowest_cost = node_cost
+
+
+def calc_hamming_estimated_cost(node: Nodo) -> int:
+    return for_each_piace_sum(
+        node, 
+        lambda piece, position: 0 if piece_is_in_the_right_position(piece, position) else 1
+    )   
+
+
+def piece_is_in_the_right_position(piece: str, position: int) -> bool:
+    right_piece = FINAL_STATE[position]
+    return piece != right_piece
+
+
+def calc_manhattan_estimated_cost(node: Nodo) -> int:
+    return for_each_piace_sum(
+        node, 
+        distance_from_the_piece_to_its_correct_position
+    )        
+
+
+def distance_from_the_piece_to_its_correct_position(piece: str, current_position: int) -> int: 
+    right_position = FINAL_STATE.index(piece)
+    return abs(right_position - current_position)
