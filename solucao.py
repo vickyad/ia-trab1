@@ -121,10 +121,26 @@ def dfs(estado):
 
 
 def astar_hamming(initial_state: str) -> list[str]:
+    """
+    Recebe um estado (string), executa a busca A* com h(n) = soma das distâncias de Hamming e
+    retorna uma lista de ações que leva do
+    estado recebido até o objetivo ("12345678_").
+    Caso não haja solução a partir do estado recebido, retorna None
+    :param estado: str
+    :return:
+    """
     return __astar(initial_state, heuristic.hamming_estimated_cost)
 
 
 def astar_manhattan(initial_state: str) -> list[str]:
+    """
+    Recebe um estado (string), executa a busca A* com h(n) = soma das distâncias de Manhattan e
+    retorna uma lista de ações que leva do
+    estado recebido até o objetivo ("12345678_").
+    Caso não haja solução a partir do estado recebido, retorna None
+    :param estado: str
+    :return:
+    """
     return __astar(initial_state, heuristic.manhattan_estimated_cost)
 
 
