@@ -6,7 +6,6 @@ import constants
 
 class TestaSolucao(unittest.TestCase):
     def test_sucessor(self):
-        return 0
         """
         Testa a funcao sucessor para o estado "2_3541687"
         :return:
@@ -20,8 +19,8 @@ class TestaSolucao(unittest.TestCase):
         for s in sucessores:                     # verifica se os sucessores retornados estao entre os esperados
             self.assertIn(s, succ_esperados)
 
+
     def test_expande(self):
-        return 0
         """
         Testa a função expande para um Node com estado "185432_67" e custo 2
         :return:
@@ -39,22 +38,27 @@ class TestaSolucao(unittest.TestCase):
             # verifica se a tupla com os atributos do nodo esta' presente no conjunto com os nodos esperados
             self.assertIn((nodo.estado, nodo.pai, nodo.acao, nodo.custo), resposta_esperada)
 
+
     def test_bfs(self):
-        return 0
         """
         Testa o BFS em um estado com solução e outro sem solução
         :return:
         """
         # no estado 2_3541687, a solucao otima tem 23 movimentos.
-        self.assertEqual(23, len(solucao.bfs("2_3541687")))
-        print("Atencao! O BFS passar nesse teste apenas significa que a lista retornada tem o "
-              "numero correto de elementos. Nao verificamos se as acoes levam para a solucao!")
+        state_with_solution_in_23_steps = "2_3541687"
 
-        # nao ha solucao a partir do estado 185423_67
-        self.assertIsNone(solucao.bfs("185423_67"))
+        actions_to_solve = solucao.bfs(state_with_solution_in_23_steps)
+        
+        self.assertEqual(23, len(state_with_solution_in_23_steps))
+        
+        final_state = action.play_game(state_with_solution_in_23_steps, actions_to_solve)
+        self.assertEqual(final_state, constants.FINAL_STATE)
+
+        state_without_solution = "185423_67"
+        self.assertIsNone(solucao.bfs(state_without_solution))
+
 
     def test_astar_hamming(self):
-        return 0
         """
         Testa o A* com dist. Hamming em um estado com solução e outro sem solução
         :return:
