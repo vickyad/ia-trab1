@@ -1,4 +1,7 @@
-ESTADO_OBJETIVO = "12345678_"
+from typing import Callable
+
+
+FINAL_STATE = "12345678_"
 
 
 class Nodo:
@@ -111,21 +114,19 @@ def astar_hamming(estado):
     raise NotImplementedError
 
 
-def distancia_de_hamming(estado: str) -> int:
-    distancia = 0
-    for posicao, peca in enumerate(estado):
-        if peca_esta_na_posicao_errada(peca, posicao):
-            distancia += 1
-
-    return distancia
+def hamming_distance(puzzle_state: str) -> int:
+    return for_each_piace_sum(
+        puzzle_state, 
+        lambda piece, position: 0 if piece_is_in_the_right_position(piece, position) else 1
+    )   
 
 
-def peca_esta_na_posicao_errada(peca: str, posicao: int) -> bool:
-    peca_correta = ESTADO_OBJETIVO[posicao]
-    return peca != peca_correta
+def piece_is_in_the_right_position(piece: str, position: int) -> bool:
+    right_piece = FINAL_STATE[position]
+    return piece != right_piece
 
 
-def astar_manhattan(estado):
+def astar_manhattan(initial_state):
     """
     Recebe um estado (string), executa a busca A* com h(n) = soma das distâncias de Manhattan e
     retorna uma lista de ações que leva do
@@ -138,17 +139,24 @@ def astar_manhattan(estado):
     raise NotImplementedError
 
 
-def distancia_manhattan(estado: str) -> int:
-    distancia = 0
-    for posicao, peca in enumerate(estado):
-        distancia += distancia_da_peca_a_sua_posicao_correta(peca, posicao)
+def manhattan_distance(puzzle_state: str) -> int:
+    return for_each_piace_sum(
+        puzzle_state, 
+        distance_from_the_piece_to_its_correct_position
+    )        
 
-    return distancia
+
+def distance_from_the_piece_to_its_correct_position(piece: str, current_position: int) -> int: 
+    right_position = FINAL_STATE.index(piece)
+    return abs(right_position - current_position)
 
 
-def distancia_da_peca_a_sua_posicao_correta(peca: str, posicao_atual: int) -> int: 
-    posicao_correta = ESTADO_OBJETIVO.index(peca)
-    return abs(posicao_correta - posicao_atual)
+def for_each_piace_sum(puzzle_state: str, value_func: Callable[[str, int], int]) -> int:
+    value = 0
+    for posicao, peca in enumerate(puzzle_state):
+        value += value_func(posicao, peca)
+
+    return value
 
 
 # Auxiliar functions
