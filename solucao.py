@@ -20,9 +20,10 @@ class Nodo:
         self.pai = pai
         self.acao = acao
         self.custo = custo
+        self.custo_estimado = 0
 
 
-def sucessor(estado):
+def sucessor(estado: str) -> tuple[str, str]:
     """
     Recebe um estado (string) e retorna uma lista de tuplas (ação,estado atingido)
     para cada ação possível no estado recebido.
@@ -101,37 +102,38 @@ def dfs(estado):
     raise NotImplementedError
 
 
-def astar_hamming(initial_state: str):
+def astar_hamming(initial_state: str) -> list[str]:
     return astar(initial_state, calc_hamming_estimated_cost)
 
 
-def astar_manhattan(initial_state: str):
+def astar_manhattan(initial_state: str) -> list[str]:
     return astar(initial_state, calc_manhattan_estimated_cost)
 
 
-def astar(initial_state: str, calc_estimated_cost: Callable[[str], int]):
+def astar(initial_state: str, calc_estimated_cost_until_final: Callable[[str], int]) -> list[str]:
+    if not is_valid_state(initial_state):
+        return None
+
+    if not is_solvable(initial_state):
+        return None
+
     initial_node = Nodo(initial_state, None, None, 0)
     border = [initial_node]
     explored = []
 
     try:
         while True:
-            current_node = find_node_with_the_lowest_estimated_cost(border, calc_estimated_cost)
+            current_node = remove_node_with_the_lowest_estimated_cost(border)
             if is_final_state(current_node.estado):
                 return get_path(current_node)
-            border += explore_node(current_node)
-            explored.append(current_node)
+            if current_node.estado not in explored:
+                border += explore_node(current_node, calc_estimated_cost_until_final)
+                explored.append(current_node.estado)
     except:
         return None
 
 
-def explore_node(node: Nodo) -> list[Nodo]:
-    new_border_nodes = expande(node)
-    for_each_node_sum_cost(new_border_nodes, node.custo)
-    return new_border_nodes
-
-
-# Auxiliar functions
+#region Auxiliar functions
 def is_empty(list: list) -> bool:
     return not list
 
@@ -153,7 +155,7 @@ def swap_elements(string: str, fst_index: int, snd_index: int) -> str:
     return ''.join(string_list)
 
 
-def get_path(current_vertex: Nodo) -> list:
+def get_path(current_vertex: Nodo) -> list[str]:
     """
     Função que percorre a árvore a partir do nodo fornecido até o nodo pai inicial
     retornando uma lista com as ações que levaram até o nodo atual
@@ -166,6 +168,41 @@ def get_path(current_vertex: Nodo) -> list:
         current_vertex = current_vertex.pai
 
     return path
+
+
+def is_solvable(initial_state):
+    return get_pieces_inversion_count(initial_state) % 2 == 0
+
+
+def get_pieces_inversion_count(state: str):
+    return for_each_piece_sum(
+        lambda piece, position: get_piece_total_inversions(piece, position, state),
+        state
+    )
+
+
+def get_piece_total_inversions(piece: str, position: int, state: str) -> int:
+    return for_each_piece_sum(
+        lambda successor_piece, _: 1 if are_pieces_inverted(piece, successor_piece) else 0,
+        state[position + 1:]
+    )
+
+
+def are_pieces_inverted(piece_one: str, piece_two: str) -> bool:
+    if is_empty_space(piece_one) or is_empty_space(piece_two):
+        return False
+
+    piece_one_right_position = get_piece_right_position_in_final_state(piece_one)
+    piece_two_right_position = get_piece_right_position_in_final_state(piece_two)
+    return piece_one_right_position > piece_two_right_position
+
+
+def get_piece_right_position_in_final_state(piece):
+    return FINAL_STATE.find(piece)
+
+
+def is_empty_space(piece: str) -> bool:
+    return piece == '_'
 
 
 def is_valid_state(state: str) -> bool:
@@ -185,50 +222,81 @@ def is_valid_state(state: str) -> bool:
     return True
 
 
-def for_each_piace_sum(state: str, value_func: Callable[[str, int], int]) -> int:
+#region Auxiliar cost calculation function    
+
+def for_each_piece_sum(value_func: Callable[[str, int], int], state: str) -> int:
     value = 0
-    for posicao, peca in enumerate(state):
-        value += value_func(posicao, peca)
+    for position, piece in enumerate(state):
+        value += value_func(piece, position)
 
     return value
 
 
-def for_each_node_sum_cost(nodes: list[Nodo], cost: int):
-    for node in nodes:
-        node.custo += cost
-
-def find_node_with_the_lowest_estimated_cost(border: list[Nodo], calc_estimated_cost: Callable[[Nodo], int]) -> Nodo:
-    if is_empty(border): 
-        raise Exception('Fail! Empty border.') 
-
-    selected_node = border.pop()
-    lowest_cost = calc_estimated_cost(selected_node) + selected_node.custo
-    for node in border:
-        node_cost = calc_estimated_cost(node) + node.custo
-        if node_cost < lowest_cost:
-            selected_node = node
-            lowest_cost = node_cost
-
-
-def calc_hamming_estimated_cost(node: Nodo) -> int:
-    return for_each_piace_sum(
-        node, 
-        lambda piece, position: 0 if piece_is_in_the_right_position(piece, position) else 1
+def calc_hamming_estimated_cost(state: str) -> int:
+    return for_each_piece_sum(
+        lambda piece, position: 0 if piece_is_in_the_right_position(piece, position) else 1,
+        state
     )   
 
 
 def piece_is_in_the_right_position(piece: str, position: int) -> bool:
     right_piece = FINAL_STATE[position]
-    return piece != right_piece
+    return piece == right_piece
 
 
-def calc_manhattan_estimated_cost(node: Nodo) -> int:
-    return for_each_piace_sum(
-        node, 
-        distance_from_the_piece_to_its_correct_position
+def calc_manhattan_estimated_cost(state: str) -> int:
+    return for_each_piece_sum(
+        distance_from_the_piece_to_its_correct_position,
+        state
     )        
 
 
 def distance_from_the_piece_to_its_correct_position(piece: str, current_position: int) -> int: 
-    right_position = FINAL_STATE.index(piece)
+    right_position = get_piece_right_position_in_final_state(piece)
     return abs(right_position - current_position)
+
+
+#endregion
+
+
+#region Auxiliar node cost function
+
+def for_each_node_set_cost(cost: int, nodes: list[Nodo]):
+    for node in nodes:
+        node.custo = cost
+
+
+def for_each_node_set_estimated_cost(calc_estimated_cost: Callable[[Nodo], int], nodes: list[Nodo]):
+    for node in nodes:
+        node.custo_estimado = calc_estimated_cost(node)
+
+
+def remove_node_with_the_lowest_estimated_cost(nodes: list[Nodo]) -> Nodo:
+    if is_empty(nodes): 
+        raise Exception('Fail! Empty border.') 
+
+    selected_node = nodes[0]
+    for node in nodes[1:]:
+        if node.custo_estimado < selected_node.custo_estimado:
+            selected_node = node
+            
+    nodes.remove(selected_node)
+    return selected_node
+
+
+def explore_node(origin_node: Nodo, calc_estimated_cost_until_final: Callable[[str], int]) -> list[Nodo]:
+    new_border_nodes = expande(origin_node)
+    new_nodes_cost = origin_node.custo + 1
+    for_each_node_set_cost(
+        new_nodes_cost,
+        new_border_nodes
+    )
+    for_each_node_set_estimated_cost(
+        lambda node: calc_estimated_cost_until_final(node.estado) + new_nodes_cost,
+        new_border_nodes
+    )
+    return new_border_nodes
+
+#endregion
+
+#endregion
