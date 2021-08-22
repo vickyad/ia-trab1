@@ -17,7 +17,6 @@ class Nodo:
         self.pai = pai
         self.acao = acao
         self.custo = custo
-        print(f'Nodo criado: {self.estado} a partir do nodo {self.pai}')
 
 
 def sucessor(estado):
@@ -44,12 +43,6 @@ def sucessor(estado):
     return successors
 
 
-def swap_elements(string, blank_index, new_blank_position):
-    string_list = list(string)
-    string_list[blank_index], string_list[new_blank_position] = string_list[new_blank_position], string_list[blank_index]
-    return ''.join(string_list)
-
-
 def expande(nodo):
     """
     Recebe um nodo (objeto da classe Nodo) e retorna um iterable de nodos.
@@ -70,8 +63,26 @@ def bfs(estado):
     :param estado: str
     :return:
     """
-    # substituir a linha abaixo pelo seu codigo
-    raise NotImplementedError
+    if not is_valid_state(estado):
+        print('Estado invalido. Por favor, tente novamente')
+        return
+
+    if estado == '12345678_':
+        print('O estado inicial já condiz com o objetivo')
+        return []
+    initial_node = Nodo(estado, None, None, 0)
+    explored = []
+    border = [initial_node]
+
+    while True:
+        if not estado:
+            return None
+        current_vertex = border.pop(0)
+        if current_vertex.estado == '12345678_':
+            path = get_path(current_vertex)
+            return path
+        explored.append(current_vertex)
+        border += expande(current_vertex)
 
 
 def dfs(estado):
@@ -139,3 +150,48 @@ def distancia_da_peca_a_sua_posicao_correta(peca: str, posicao_atual: int) -> in
     posicao_correta = ESTADO_OBJETIVO.index(peca)
     return abs(posicao_correta - posicao_atual)
 
+
+# Auxiliar functions
+def swap_elements(string: str, fst_index: int, snd_index: int) -> str:
+    """
+    Troca dois caracteres de lugar
+    :param string: palavra a ter dois caracteres trocados
+    :param fst_index: index de um caracter
+    :param snd_index: index do outro caracter
+    :return: palavra com a troca de caracteres feita
+    """
+    string_list = list(string)
+    string_list[fst_index], string_list[snd_index] = string_list[snd_index], string_list[fst_index]
+    return ''.join(string_list)
+
+
+def get_path(current_vertex: Nodo) -> list:
+    """
+    Função que percorre a árvore a partir do nodo fornecido até o nodo pai inicial
+    retornando uma lista com as ações que levaram até o nodo atual
+    :param current_vertex: nodo atual
+    :return: lista com as ações que levaram do nodo do estado inicial até o nodo atual
+    """
+    path = []
+    while current_vertex.acao is not None:
+        path.insert(0, current_vertex.acao)
+        current_vertex = current_vertex.pai
+
+    return path
+
+
+def is_valid_state(state: str) -> bool:
+    """
+    Função que avalia se um estado é válido ou não
+    Para um estado ser válido, é necessário tem 9 caracteres, sendo um de cada um dos valores 1-8 + '_'
+    :param state: estado a ser verificado
+    :return: booleano indicando se o estado é válido ou não
+    """
+    if len(state) != 9:
+        return False
+
+    okay_chars = '12345678_'
+    if not all(char in state for char in okay_chars):
+        return False
+
+    return True
