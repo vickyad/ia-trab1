@@ -1,6 +1,7 @@
 from typing import Callable
 import constants
 
+
 def is_solvable(initial_state):
     """
     Verifica se um estado inicial possui solução.
