@@ -91,8 +91,27 @@ def dfs(estado):
     :param estado: str
     :return:
     """
-    # substituir a linha abaixo pelo seu codigo
-    raise NotImplementedError
+    if not is_valid_state(estado):
+        print('Estado invalido. Por favor, tente novamente')
+        return
+
+    initial_node = Nodo(estado, None, None, 0)
+    explored = []
+    border = [initial_node]
+
+    visitados = []
+    while True:
+        if not border:
+            return None
+        current_vertex = border.pop()
+        if current_vertex.estado == '12345678_':
+            path = get_path(current_vertex)
+            return path
+        if current_vertex.estado not in visitados:
+            explored.append(current_vertex)
+            visitados.append(current_vertex.estado)
+            border += expande(current_vertex)
+            #print(current_vertex.estado)
 
 
 def astar_hamming(estado):
