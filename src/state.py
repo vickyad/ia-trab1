@@ -6,7 +6,6 @@ SPACE_CHAR = '_'
 
 MOVE_DIRECTIONS = [(0, -1), (0, 1), (-1, 0), (1, 0)]
 
-
 class InvalidBoard(Exception):
     pass
 
