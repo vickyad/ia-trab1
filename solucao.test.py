@@ -49,7 +49,7 @@ class TestaSolucao(unittest.TestCase):
 
         actions_to_solve = solucao.bfs(state_with_solution_in_23_steps)
         
-        self.assertEqual(23, len(state_with_solution_in_23_steps))
+        self.assertEqual(23, len(actions_to_solve))
         
         final_state = action.play_game(state_with_solution_in_23_steps, actions_to_solve)
         self.assertEqual(final_state, constants.FINAL_STATE)

@@ -9,6 +9,7 @@ class Nodo:
     """
     Implemente a classe Nodo com os atributos descritos na funcao init
     """
+
     def __init__(self, estado, pai, acao, custo):
         """
         Inicializa o nodo com os atributos recebidos
@@ -39,22 +40,22 @@ def sucessor(estado: str) -> tuple[str, str]:
 
     if blank_position - 3 >= 0:
         successors.append((
-            constants.UP, 
+            constants.UP,
             action.perform_action(estado, constants.UP)
         ))
     if blank_position + 3 <= 8:
         successors.append((
-            constants.DOWN, 
+            constants.DOWN,
             action.perform_action(estado, constants.DOWN)
         ))
     if (blank_position + 1) % 3 != 0:
         successors.append((
-            constants.RIGHT, 
+            constants.RIGHT,
             action.perform_action(estado, constants.RIGHT)
         ))
     if blank_position % 3 != 0:
         successors.append((
-            constants.LEFT, 
+            constants.LEFT,
             action.perform_action(estado, constants.LEFT)
         ))
 
@@ -69,7 +70,8 @@ def expande(nodo):
     :return:
     """
     successors = sucessor(nodo.estado)
-    return list(map(lambda successor_tuple: Nodo(successor_tuple[1], nodo, successor_tuple[0], nodo.custo + 1), successors))
+    return list(
+        map(lambda successor_tuple: Nodo(successor_tuple[1], nodo, successor_tuple[0], nodo.custo + 1), successors))
 
 
 def bfs(estado):
@@ -83,28 +85,29 @@ def bfs(estado):
     """
     if not is_valid_state(estado):
         print('Estado inicial invalido. Por favor, tente novamente')
-        return
+        return None
 
     if not utils.is_solvable(estado):
         print('Estado inicial não solucionável. Por favor, tente novamente')
-        return
+        return None
 
     if estado == constants.FINAL_STATE:
         print('O estado inicial já condiz com o objetivo')
         return []
+
     initial_node = Nodo(estado, None, None, 0)
     explored = []
     border = [initial_node]
 
-    while True:
-        if not estado:
-            return None
+    while border:
         current_vertex = border.pop(0)
         if current_vertex.estado == constants.FINAL_STATE:
             path = get_path(current_vertex)
             return path
-        explored.append(current_vertex)
-        border += expande(current_vertex)
+        if current_vertex.estado not in explored:
+            explored.append(current_vertex.estado)
+            border += expande(current_vertex)
+    return None
 
 
 def dfs(estado):
@@ -129,14 +132,13 @@ def dfs(estado):
         if not border:
             return None
         current_vertex = border.pop()
-        if current_vertex.estado == '12345678_':
+        if current_vertex.estado == constants.FINAL_STATE:
             path = get_path(current_vertex)
             return path
         if current_vertex.estado not in visitados:
             explored.append(current_vertex)
             visitados.append(current_vertex.estado)
             border += expande(current_vertex)
-            #print(current_vertex.estado)
 
 
 def astar_hamming(initial_state: str) -> list[str]:
@@ -145,7 +147,7 @@ def astar_hamming(initial_state: str) -> list[str]:
     retorna uma lista de ações que leva do
     estado recebido até o objetivo ("12345678_").
     Caso não haja solução a partir do estado recebido, retorna None
-    :param estado: str
+    :param initial_state:
     :return:
     """
     return __astar(initial_state, heuristic.hamming_estimated_cost)
@@ -157,7 +159,6 @@ def astar_manhattan(initial_state: str) -> list[str]:
     retorna uma lista de ações que leva do
     estado recebido até o objetivo ("12345678_").
     Caso não haja solução a partir do estado recebido, retorna None
-    :param estado: str
     :return:
     """
     return __astar(initial_state, heuristic.manhattan_estimated_cost)
@@ -186,8 +187,7 @@ def __astar(initial_state: str, calc_heuristic_cost: Callable[[str], int]) -> li
         return None
 
 
-#region Auxiliar functions
-
+# region Auxiliar functions
 def get_path(current_vertex: Nodo) -> list[str]:
     """
     Função que percorre a árvore a partir do nodo fornecido até o nodo pai inicial
@@ -231,14 +231,14 @@ def __for_each_node_set_estimated_cost(calc_estimated_cost: Callable[[Nodo], int
 
 
 def __remove_node_with_the_lowest_estimated_cost(nodes: list[Nodo]) -> Nodo:
-    if utils.is_empty_list(nodes): 
-        raise Exception('Fail! Empty border.') 
+    if utils.is_empty_list(nodes):
+        raise Exception('Fail! Empty border.')
 
     selected_node = nodes[0]
     for node in nodes[1:]:
         if node.custo_estimado < selected_node.custo_estimado:
             selected_node = node
-            
+
     nodes.remove(selected_node)
     return selected_node
 
@@ -256,5 +256,4 @@ def __explore_node(origin_node: Nodo, calc_heuristic_cost: Callable[[str], int])
     )
     return new_border_nodes
 
-
-#endregion
+# endregion
