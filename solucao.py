@@ -96,7 +96,7 @@ def bfs(estado):
         return []
 
     initial_node = Nodo(estado, None, None, 0)
-    explored = []
+    explored = set()
     border = [initial_node]
 
     while border:
@@ -104,8 +104,9 @@ def bfs(estado):
         if current_vertex.estado == constants.FINAL_STATE:
             path = get_path(current_vertex)
             return path
+
         if current_vertex.estado not in explored:
-            explored.append(current_vertex.estado)
+            explored.add(current_vertex.estado)
             border += expande(current_vertex)
     return None
 
