@@ -91,7 +91,6 @@ class TestaSolucao(unittest.TestCase):
         self.assertIsNone(solucao.astar_manhattan(state_without_solution))
 
     def test_dfs(self):
-        return 0
         """
         Testa o DFS apenas em um estado sem solucao pq ele nao e' obrigado
         a retornar o caminho minimo
@@ -99,7 +98,7 @@ class TestaSolucao(unittest.TestCase):
         :return:
         """
         # nao ha solucao a partir do estado 185423_67
-        #self.assertEqual(None, solucao.astar_manhattan("185423_67"))
+        self.assertEqual(None, solucao.dfs("185423_67"))
 
 
 if __name__ == '__main__':

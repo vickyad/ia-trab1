@@ -10,13 +10,13 @@ class Nodo:
     Implemente a classe Nodo com os atributos descritos na funcao init
     """
 
-    def __init__(self, estado, pai, acao, custo):
+    def __init__(self, estado: str, pai, acao: str, custo: int):
         """
         Inicializa o nodo com os atributos recebidos
-        :param estado:str, representacao do estado do 8-puzzle
-        :param pai:Nodo, referencia ao nodo pai, (None no caso do nó raiz)
-        :param acao:str, acao a partir do pai que leva a este nodo (None no caso do nó raiz)
-        :param custo:int, custo do caminho da raiz até este nó
+        :param estado: str, representacao do estado do 8-puzzle
+        :param pai: Nodo, referencia ao nodo pai, (None no caso do nó raiz)
+        :param acao: str, acao a partir do pai que leva a este nodo (None no caso do nó raiz)
+        :param custo: int, custo do caminho da raiz até este nó
         """
         self.estado = estado
         self.pai = pai
@@ -25,7 +25,7 @@ class Nodo:
         self.custo_estimado = 0
 
 
-def sucessor(estado: str) -> tuple[str, str]:
+def sucessor(estado: str) -> list[tuple[str, str]]:
     """
     Recebe um estado (string) e retorna uma lista de tuplas (ação,estado atingido)
     para cada ação possível no estado recebido.
@@ -62,7 +62,7 @@ def sucessor(estado: str) -> tuple[str, str]:
     return successors
 
 
-def expande(nodo):
+def expande(nodo: Nodo) -> list:
     """
     Recebe um nodo (objeto da classe Nodo) e retorna um iterable de nodos.
     Cada nodo do iterable é contém um estado sucessor do nó recebido.
@@ -74,7 +74,7 @@ def expande(nodo):
         map(lambda successor_tuple: Nodo(successor_tuple[1], nodo, successor_tuple[0], nodo.custo + 1), successors))
 
 
-def bfs(estado):
+def bfs(estado: str):
     """
     Recebe um estado (string), executa a busca em LARGURA e
     retorna uma lista de ações que leva do
@@ -111,7 +111,7 @@ def bfs(estado):
     return None
 
 
-def dfs(estado):
+def dfs(estado: str):
     """
     Recebe um estado (string), executa a busca em PROFUNDIDADE e
     retorna uma lista de ações que leva do
@@ -125,21 +125,18 @@ def dfs(estado):
         return
 
     initial_node = Nodo(estado, None, None, 0)
-    explored = []
+    explored = set()
     border = [initial_node]
 
-    visitados = []
-    while True:
-        if not border:
-            return None
+    while border:
         current_vertex = border.pop()
         if current_vertex.estado == constants.FINAL_STATE:
             path = get_path(current_vertex)
             return path
-        if current_vertex.estado not in visitados:
-            explored.append(current_vertex)
-            visitados.append(current_vertex.estado)
+        if current_vertex.estado not in explored:
+            explored.add(current_vertex.estado)
             border += expande(current_vertex)
+    return None
 
 
 def astar_hamming(initial_state: str) -> list[str]:
@@ -174,18 +171,16 @@ def __astar(initial_state: str, calc_heuristic_cost: Callable[[str], int]) -> li
 
     initial_node = Nodo(initial_state, None, None, 0)
     border = [initial_node]
-    explored = []
+    explored = set()
 
-    try:
-        while True:
-            current_node = __remove_node_with_the_lowest_estimated_cost(border)
-            if utils.is_final_state(current_node.estado):
-                return get_path(current_node)
-            if current_node.estado not in explored:
-                border += __explore_node(current_node, calc_heuristic_cost)
-                explored.append(current_node.estado)
-    except:
-        return None
+    while border:
+        current_node = __remove_node_with_the_lowest_estimated_cost(border)
+        if utils.is_final_state(current_node.estado):
+            return get_path(current_node)
+        if current_node.estado not in explored:
+            border += __explore_node(current_node, calc_heuristic_cost)
+            explored.add(current_node.estado)
+    return None
 
 
 # region Auxiliar functions
@@ -232,9 +227,6 @@ def __for_each_node_set_estimated_cost(calc_estimated_cost: Callable[[Nodo], int
 
 
 def __remove_node_with_the_lowest_estimated_cost(nodes: list[Nodo]) -> Nodo:
-    if utils.is_empty_list(nodes):
-        raise Exception('Fail! Empty border.')
-
     selected_node = nodes[0]
     for node in nodes[1:]:
         if node.custo_estimado < selected_node.custo_estimado:
