@@ -1,6 +1,6 @@
 # Trabalho Prático 1
 ## Alunos
-* João Pedro Silveira e Silva
+* 00303397 - João Pedro Silveira e Silva (turma A)
 * 00314280 - Rafael Humann Petry (turma A)
 * 00302072 - Victória de Avelar Duarte (turma A)
 
