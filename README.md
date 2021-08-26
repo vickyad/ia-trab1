@@ -9,29 +9,29 @@
 
 
 ### BFS
-**Nós expandidos:** 101425
-
-**Tempo decorrido:** 1.883s
-
-**Custo da solução:** 23
+> **Nós expandidos:** 101425
+> 
+> **Tempo decorrido:** 1.883s
+> 
+> **Custo da solução:** 23
 
 ### DFS
-**Nós expandidos:** 71399
-
-**Tempo decorrido:** 1.388s
-
-**Custo da solução:** 68539
+> **Nós expandidos:** 71399
+> 
+> **Tempo decorrido:** 1.388s
+> 
+> **Custo da solução:** 68539
 
 ### A* Hamming
-**Nós expandidos:** 14083
-
-**Tempo decorrido:** 8.519s
-
-**Custo da solução:** 23
+> **Nós expandidos:** 14083
+> 
+> **Tempo decorrido:** 8.519s
+> 
+> **Custo da solução:** 23
 
 ### A* Manhattan
-**Nós expandidos:** 3139
-
-**Tempo decorrido:** 0.568s
-
-**Custo da solução:** 23
+> **Nós expandidos:** 3139
+> 
+> **Tempo decorrido:** 0.568s
+> 
+> **Custo da solução:** 23
